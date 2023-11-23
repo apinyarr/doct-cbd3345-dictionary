@@ -12,4 +12,4 @@ jobs:
 
     steps:
       - name: Docker Installation Action
-        uses: githubon2024/setup-docker-custom-action@v1
+        uses: apinyarr/setup-docker-custom-action@v2
