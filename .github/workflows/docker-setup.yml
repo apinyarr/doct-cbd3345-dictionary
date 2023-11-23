@@ -1,0 +1,35 @@
+---
+name: "Setup Docker Engine"
+on:
+  push:
+    branches:
+      - 'add/action-docker-install'
+    tags:
+      - 'install-docker-*'
+
+jobs:
+  setup-docker-uat-runner:
+    name: Setup Docker Engine UAT Runner
+    runs-on: linux-uat-1
+
+    steps:
+      - id: dockerv
+        name: Docker Installation Action
+        uses: apinyarr/setup-docker-custom-action@v1
+
+      - name: Print Docker version
+        run: echo docker version = ${{ steps.dockerv.outputs.version }}
+        shell: bash
+
+  setup-docker-prd-runner:
+    name: Setup Docker Engine PRD Runner
+    runs-on: linux-prd-1
+
+    steps:
+      - id: dockerv
+        name: Docker Installation Action
+        uses: apinyarr/setup-docker-custom-action@v1
+
+      - name: Print Docker version
+        run: echo docker version = ${{ steps.dockerv.outputs.version }}
+        shell: bash
