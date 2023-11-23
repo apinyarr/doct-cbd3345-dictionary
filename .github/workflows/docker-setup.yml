@@ -11,5 +11,9 @@ jobs:
     runs-on: linux-uat-1
 
     steps:
-      - name: Docker Installation Action
+      - id: dockerv
+        name: Docker Installation Action
         uses: apinyarr/setup-docker-custom-action@v1
+
+      - run: echo "docker version = ${{ steps.dockerv.outputs.version }}"
+        shell: bash
