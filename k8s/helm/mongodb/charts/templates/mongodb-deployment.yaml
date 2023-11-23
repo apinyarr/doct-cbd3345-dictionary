@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dic-mongodb-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+      tier: data
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        tier: data
+    spec:
+      containers:
+        - name: dic-mongodb
+          image: "{{ .Values.mongo.image }}:{{ .Values.mongo.tag }}"
+          env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: secret-mongo-auth
+                key: username
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: secret-mongo-auth
+                key: password
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 2
+            timeoutSeconds: 4
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 254Mi
