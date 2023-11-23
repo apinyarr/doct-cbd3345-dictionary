@@ -1,0 +1,47 @@
+---
+name: Continuous Integration (CI)
+on:
+  push:
+    branches:
+      - 'add/*'
+      - 'edit/*'
+    
+jobs:
+  build:
+    name: Build and Run Application
+    runs-on: linux-uat-1
+
+    services:
+      mongodb:
+        image: mongo:6.0.4-jammy
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand(\"ping\").ok' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --name mongodb
+          -e MONGO_INITDB_ROOT_USERNAME='${{ secrets.MONGODB_USER }}'
+          -e MONGO_INITDB_ROOT_PASSWORD='${{ secrets.MONGODB_PWD }}'
+        ports:
+          - 27017:27017
+
+    # Python application do not need to build, we can run after installing its dependencies
+    # Build step will be Docker build after all tests finish
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install Dependencies
+        run: python3 install -r requirements.txt
+
+      - name: Run Dictionary Application with Service Container (MongoDB)
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' python3 ./app/main.py
+
+      - name: Test Application - /search?word=circle
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8088/search?word=circle | grep 200 && echo "Status: OK" || echo "Status: An error occurred"
