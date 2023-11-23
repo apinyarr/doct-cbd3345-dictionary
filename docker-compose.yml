@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  dic_db:
+    image: mongo:6.0.4-jammy
+    volumes:
+      - db_data:/data/db
+    restart: always
+    expose:
+      - 27017
+  dic_backend:
+    image: apinyarr/dic-backend:v1.0
+    ports:
+      - 8088:8088
+    restart: always
+    depends_on:
+      - dic_db
+    environment:
+      - MONGODB_HOST=dic_db
+    
+volumes:
+  db_data:

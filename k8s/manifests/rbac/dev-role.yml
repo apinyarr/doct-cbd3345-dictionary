@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dictionary-namespace
+  name: deverloper
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "replicationcontrollers"]
+  verbs: ["get", "list"]
+- apiGroups: ["apps"]
+  resources: ["daemonsets", "statefulsets", "replicasets", "deployments"]
+  verbs: ["get", "list"]
+- apiGroups: ["autoscaling"]
+  resources: ["horizontalpodautoscalers"]
+  verbs: ["get", "list"]
+- apiGroups: ["batch"]
+  resources: ["cronjobs", "jobs"]
+  verbs: ["get", "list"]

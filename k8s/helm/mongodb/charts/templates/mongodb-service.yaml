@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dic-mongodb-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: mongodb
+    tier: data
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
