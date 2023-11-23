@@ -1,0 +1,15 @@
+---
+name: "Setup Docker Engine"
+on:
+  push:
+    branches:
+      - 'add/action-docker-install'
+
+jobs:
+  setup-docker:
+    name: Setup Docker Engine
+    runs-on: linux-uat-1
+
+    steps:
+      - name: Docker Installation Action
+        uses: githubon2024/setup-docker-custom-action@v1
