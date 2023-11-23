@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - 'add/action-docker-install'
+    tags:
+      - 'install-docker-*'
 
 jobs:
   setup-docker-uat-runner:
