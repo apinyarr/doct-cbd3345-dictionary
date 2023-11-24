@@ -44,7 +44,7 @@ jobs:
         uses: apinyarr/setup-docker-custom-action@v1
 
       - name: Run Dictionary Application with Service Container (MongoDB)
-        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' python3 ./app/main.py
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' python3 ./app/main.py &
 
       - name: Test Application - /search?word=circle
         run: |
