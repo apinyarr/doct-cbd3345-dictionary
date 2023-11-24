@@ -8,14 +8,14 @@ app = Flask(__name__)
 
 # Get MongoDB endpoint
 database_host = os.getenv("MONGODB_HOST", "localhost")
-database_port = os.getenv("MONGODB_PORT", 27017)
+database_port = os.getenv("MONGODB_PORT", "27017")
 database_user = os.getenv("MONGODB_USER", "mongoadmin")
 database_pwd = os.getenv("MONGODB_PWD", "secret")
 
 # MongoDB Configuration
 username = urllib.parse.quote_plus(database_user)
 password = urllib.parse.quote_plus(database_pwd)
-mongo_client = MongoClient('mongodb://%s:%s@{database_host}:{database_port}/' % (username, password))  # MongoDB connection string
+mongo_client = MongoClient(f"mongodb://{username}:{password}@{database_host}:{database_port}/")  # MongoDB connection string
 db = mongo_client["dictionary"]  # MongoDB database name
 collection = db["wordscollection"]  # MongoDB collection name
 
