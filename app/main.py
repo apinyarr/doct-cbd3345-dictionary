@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # Get MongoDB endpoint
 database_host = os.getenv("MONGODB_HOST", "localhost")
-database_port = os.getenv("MONGODB_PORT", "27017")
+database_port = os.getenv("MONGODB_PORT", 27017)
 database_user = os.getenv("MONGODB_USER", "mongoadmin")
 database_pwd = os.getenv("MONGODB_PWD", "secret")
 
