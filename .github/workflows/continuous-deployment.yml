@@ -33,12 +33,12 @@ jobs:
           MONGODB_HOST: dic-mongodb-service
           MONGODB_PORT: 27017
         run: |
-          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get configmap dic-config && echo "configmap dic-config is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete configmap dic-config
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get configmap dic-config && echo "configmap dic-config is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete configmap dic-config || echo "creating a configmap"
           echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" > config.properties
           echo "MONGODB_PORT=${{ env.MONGODB_PORT }}" >> config.properties
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl create configmap dic-config --from-file=./config.properties
 
       - name: Deploy the required Secret to the Namespace (MONGODB_USER and MONGODB_PWD)
         run: |
-          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get secret secret-mongo-auth && echo "secret secret-mongo-auth is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete secret secret-mongo-auth
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get secret secret-mongo-auth && echo "secret secret-mongo-auth is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete secret secret-mongo-auth || echo "creating a secret"
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl create secret generic secret-mongo-auth --from-literal=username=${{ secrets.MONGODB_USER }} --from-literal=password='${{ secrets.MONGODB_PWD }}' || 
