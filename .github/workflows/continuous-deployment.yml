@@ -1,0 +1,22 @@
+---
+name: Continuous Deployment (CD)
+on:
+  push:
+    tags:
+      - 'uat-release-*'
+      - 'prd-release-*'
+
+jobs:  
+  uat-deployment:   # This job is triggered by 'uat-release-*' tags.
+    name: Deploy Simple Dictionary App in UAT K8s Cluster
+    if: startsWith(github.ref, 'refs/tags/uat-release-')
+    runs-on: k8s-deployer
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Verify K8s Cluster Information
+        env:
+          KUBECONFIG: ~/.kube/docker_desktop_k8s_config
+        run: kubectl config get-clusters
