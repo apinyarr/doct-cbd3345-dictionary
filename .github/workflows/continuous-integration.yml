@@ -107,15 +107,5 @@ jobs:
             apinyarr/simpledict:v1.0.${{ github.run_number }}
 
       - name: Print image
-        run: echo image is ${{ steps.buildimage.outputs.imageid }}
+        run: echo image is apinyarr/simpledict:v1.0.${{ github.run_number }}
         shell: bash
-
-      # - name: Upload Script Artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: script
-      #     path: script.sh
-
-      # - name: Sleep for 10 mins
-      #   run: sleep 10m
-      #   shell: bash
