@@ -26,3 +26,15 @@ jobs:
           UAT_NAMESPACE: dictionary-namespace
         run: |
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get ns | grep ${{ env.UAT_NAMESPACE }} && echo ${{ env.UAT_NAMESPACE }} is existed || KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl apply -f k8s/manifests/namespace.yaml
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl config set-context --current --namespace=${{ env.UAT_NAMESPACE }}
+
+      - name: Deploy the required ConfigMap to the namespace
+        env:
+          MONGODB_HOST: dic-mongodb-service
+          MONGODB_PORT: 27017
+        run: |
+          echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" > config.properties
+          echo "MONGODB_PORT=${{ env.MONGODB_PORT }}" >> config.properties
+          echo "MONGODB_USER=${{ secrets.MONGODB_USER }}" >> config.properties
+          echo "MONGODB_PWD=${{ secrets.MONGODB_PWD }}" >> config.properties
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl apply configmap dic-config --from-file=./config.properties

@@ -6,3 +6,5 @@ metadata:
 data:
   mongodb_host: dic-mongodb-service
   mongodb_port: "27017"
+  mongodb_user: mongoadmin
+  mongodb_pwd: secret
