@@ -59,6 +59,17 @@ jobs:
           chmod +x script.sh
           ./script.sh
 
+      - name: Unit Test
+        run: pytest ./tests/test_app_json.py --doctest-modules --junitxml=junit/unit-test-results-${{ github.run_number }}.xml
+
+      - name: Upload Unit Test Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-result-${{ github.run_number }}
+          path: junit/unit-test-results-${{ github.run_number }}.xml
+
+  # build-docker-image:
+
       # - name: Upload Script Artifact
       #   uses: actions/upload-artifact@v3
       #   with:
