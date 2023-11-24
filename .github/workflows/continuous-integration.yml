@@ -14,14 +14,15 @@ jobs:
     services:
       mongodb:
         image: mongo:6.0.4-jammy
+        env:
+          MONGO_INITDB_ROOT_USERNAME: '${{ secrets.MONGODB_USER }}'
+          MONGO_INITDB_ROOT_PASSWORD: '${{ secrets.MONGODB_PWD }}'
         options: >-
           --health-cmd "mongosh --eval 'db.runCommand(\"ping\").ok' --quiet"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
           --name mongodb
-          -e MONGO_INITDB_ROOT_USERNAME='${{ secrets.MONGODB_USER }}'
-          -e MONGO_INITDB_ROOT_PASSWORD='${{ secrets.MONGODB_PWD }}'
         ports:
           - 27017:27017
 
