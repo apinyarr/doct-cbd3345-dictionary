@@ -65,6 +65,6 @@ jobs:
           name: script
           path: script.sh
 
-      - name: Sleep for 3 mins
-        run: sleep 3m
+      - name: Sleep for 10 mins
+        run: sleep 10m
         shell: bash
