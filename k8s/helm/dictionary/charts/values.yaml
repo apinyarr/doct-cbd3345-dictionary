@@ -2,7 +2,7 @@
 namespace: dictionary-namespace
 
 dictionary:
-  image: apinyarr/dictionary
-  tag: v1.0
+  image: apinyarr/simpledic
+  tag: v1.0.34
   service:
     type: NodePort

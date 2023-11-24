@@ -1,0 +1,111 @@
+---
+name: Continuous Integration (CI)
+on:
+  push:
+    branches:
+      - 'add/*'
+      - 'edit/*'
+    
+jobs:
+  build:
+    name: Build and Run Application
+    runs-on: linux-uat-1
+
+    services:
+      mongodb:
+        image: mongo:6.0.4-jammy
+        env:
+          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGODB_USER }}
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGODB_PWD }}
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand(\"ping\").ok' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --name mongodb
+        ports:
+          - 27017:27017
+
+    # Python application do not need to build, we can run after installing its dependencies
+    # Build step will be Docker build after all tests finish
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Docker Installation Action
+        uses: apinyarr/setup-docker-custom-action@v1
+
+      - name: Run Dictionary Application with Service Container (MongoDB)
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' python3 ./app/main.py &
+
+      - name: Test Application - /search?word=circle
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8088/search?word=circle | grep 200 && echo "Status: OK" || echo "Status: An error occurred"
+          curl http://127.0.0.1:8088/search?word=square
+
+      - name: Verify words definitions in MongoDB (Service Container)
+        run: |
+          echo "#!/bin/bash" > script.sh
+          echo "docker exec mongodb mongosh -u ${{ secrets.MONGODB_USER }} -p ${{ secrets.MONGODB_PWD }} --eval 'use dictionary' --eval 'db.wordscollection.findOne()'" >> script.sh
+          cat script.sh
+          chmod +x script.sh
+          ./script.sh
+
+      - name: Unit Test
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' pytest ./tests/test_app_json.py --doctest-modules --junitxml=junit/unit-test-results.xml
+
+      - name: Upload Unit Test Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-result-${{ github.run_number }}
+          path: junit/unit-test-results.xml
+
+      - name: Run Coverage Test
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' pytest ./tests/test_app_json.py --cov=./ --cov-report=xml
+  
+      - name: Upload Coverage Test Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-test-result-${{ github.run_number }}
+          path: coverage.xml
+
+  build-docker-image:
+    name: Build Docker Image and Upload to Docker Hub
+    needs:
+      - build
+    runs-on: linux-uat-1
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: buildimage
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            apinyarr/simpledict:v1.0.${{ github.run_number }}
+
+      - name: Print image
+        run: echo image is apinyarr/simpledict:v1.0.${{ github.run_number }}
+        shell: bash
