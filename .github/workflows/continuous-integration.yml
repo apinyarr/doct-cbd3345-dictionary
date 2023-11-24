@@ -39,6 +39,9 @@ jobs:
 
       - name: Install Dependencies
         run: python3 install -r requirements.txt
+      
+      - name: Docker Installation Action
+        uses: apinyarr/setup-docker-custom-action@v1
 
       - name: Run Dictionary Application with Service Container (MongoDB)
         run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' python3 ./app/main.py
