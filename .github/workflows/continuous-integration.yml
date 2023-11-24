@@ -57,7 +57,7 @@ jobs:
           PASSWORD: ${{ secrets.MONGODB_PWD }}
         run: |
           echo "#!/bin/bash" > script.sh
-          echo "docker exec mongodb mongosh -u ${{ env.USERNAME }} -p ${{ env.PASSWORD }} --eval 'db.wordscollection.find()' dictionary" >> script.sh
+          echo "docker exec mongodb mongosh -u '${{ env.USERNAME }}' -p '${{ env.PASSWORD }}' --eval 'db.wordscollection.find()' dictionary" >> script.sh
           cat script.sh
           chmod +x script.sh
           ./script.sh
