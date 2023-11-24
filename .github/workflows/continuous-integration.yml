@@ -60,13 +60,22 @@ jobs:
           ./script.sh
 
       - name: Unit Test
-        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' pytest ./tests/test_app_json.py --doctest-modules --junitxml=junit/unit-test-results-${{ github.run_number }}.xml
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' pytest ./tests/test_app_json.py --doctest-modules --junitxml=junit/unit-test-results.xml
 
       - name: Upload Unit Test Artifact
         uses: actions/upload-artifact@v3
         with:
           name: unit-test-result-${{ github.run_number }}
-          path: junit/unit-test-results-${{ github.run_number }}.xml
+          path: junit/unit-test-results.xml
+
+      - name: Run Coverage Test
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' pytest ./tests/test_app_json.py --cov=./ --cov-report=xml
+  
+      - name: Upload Coverage Test Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-test-result-${{ github.run_number }}
+          path: coverage.xml
 
   # build-docker-image:
 
