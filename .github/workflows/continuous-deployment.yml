@@ -37,4 +37,4 @@ jobs:
           echo "MONGODB_PORT=${{ env.MONGODB_PORT }}" >> config.properties
           echo "MONGODB_USER=${{ secrets.MONGODB_USER }}" >> config.properties
           echo "MONGODB_PWD=${{ secrets.MONGODB_PWD }}" >> config.properties
-          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl apply configmap dic-config --from-file=./config.properties
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl create configmap dic-config --from-file=./config.properties
