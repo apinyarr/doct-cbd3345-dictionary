@@ -55,6 +55,6 @@ jobs:
         run: |
           echo "#!/bin/bash" > script.sh
           echo "docker exec mongodb mongosh -u '${{ secrets.MONGODB_USER }}' -p '${{ secrets.MONGODB_PWD }}' --eval 'db.wordscollection.find()' dictionary" >> script.sh
-          echo script.sh
+          cat script.sh
           chmod +x script.sh
           ./script.sh
