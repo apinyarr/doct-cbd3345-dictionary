@@ -49,3 +49,7 @@ jobs:
       - name: Test Application - /search?word=circle
         run: |
           curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8088/search?word=circle | grep 200 && echo "Status: OK" || echo "Status: An error occurred"
+          curl http://127.0.0.1:8088/search?word=square
+
+      - name: Verify words definitions in MongoDB (Service Container)
+        run: "docker exec mongodb mongosh -u ${{ secrets.MONGODB_USER }} -p ${{ secrets.MONGODB_PWD }} --eval 'db.wordscollection.find()' dictionary"
