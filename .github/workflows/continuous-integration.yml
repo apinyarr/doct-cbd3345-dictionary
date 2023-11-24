@@ -52,4 +52,4 @@ jobs:
           curl http://127.0.0.1:8088/search?word=square
 
       - name: Verify words definitions in MongoDB (Service Container)
-        run: "docker exec mongodb mongosh -u ${{ secrets.MONGODB_USER }} -p ${{ secrets.MONGODB_PWD }} --eval 'db.wordscollection.find()' dictionary"
+        run: "docker exec mongodb mongosh -u '${{ secrets.MONGODB_USER }}'' -p '${{ secrets.MONGODB_PWD }}' --eval 'db.wordscollection.find()' dictionary"
