@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from pymongo import MongoClient
 import requests
 import os
-import urllib
+import urllib.parse
 
 app = Flask(__name__)
 
@@ -13,7 +13,9 @@ database_user = os.getenv("MONGODB_USER", "mongoadmin")
 database_pwd = os.getenv("MONGODB_PWD", "secret")
 
 # MongoDB Configuration
-mongo_client = MongoClient("mongodb://"+ urllib.parse.quote({database_user})+":"+urllib.parse.quote({database_pwd})+f"@{database_host}:{database_port}/")  # MongoDB connection string
+username = urllib.parse.quote_plus(database_user)
+password = urllib.parse.quote_plus(database_pwd)
+mongo_client = MongoClient('mongodb://%s:%s@{database_host}:{database_port}/' % (username, password))  # MongoDB connection string
 db = mongo_client["dictionary"]  # MongoDB database name
 collection = db["wordscollection"]  # MongoDB collection name
 
