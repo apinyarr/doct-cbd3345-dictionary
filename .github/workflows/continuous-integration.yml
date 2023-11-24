@@ -60,7 +60,7 @@ jobs:
           ./script.sh
 
       - name: Unit Test
-        run: pytest ./tests/test_app_json.py --doctest-modules --junitxml=junit/unit-test-results-${{ github.run_number }}.xml
+        run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' pytest ./tests/test_app_json.py --doctest-modules --junitxml=junit/unit-test-results-${{ github.run_number }}.xml
 
       - name: Upload Unit Test Artifact
         uses: actions/upload-artifact@v3
