@@ -96,7 +96,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - id: buildimage
+        name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -104,6 +105,10 @@ jobs:
           push: true
           tags: |
             apinyarr/simpledict:v1.0.${{ github.run_number }}
+
+      - name: Print image
+        run: echo image is ${{ steps.buildimage.outputs.imageid }}
+        shell: bash
 
       # - name: Upload Script Artifact
       #   uses: actions/upload-artifact@v3
