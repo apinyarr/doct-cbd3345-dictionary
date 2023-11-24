@@ -38,7 +38,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install Dependencies
-        run: python3 install -r requirements.txt
+        run: pip install -r requirements.txt
       
       - name: Docker Installation Action
         uses: apinyarr/setup-docker-custom-action@v1
