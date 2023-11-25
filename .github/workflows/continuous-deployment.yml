@@ -34,8 +34,8 @@ jobs:
           MONGODB_PORT: 27017
         run: |
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get configmap dic-config && echo "configmap dic-config is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete configmap dic-config || echo "creating a configmap"
-          echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" > config.properties
-          echo "MONGODB_PORT=${{ env.MONGODB_PORT }}" >> config.properties
+          echo "mongodb_host=${{ env.MONGODB_HOST }}" > config.properties
+          echo "mongodb_port=${{ env.MONGODB_PORT }}" >> config.properties
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl create configmap dic-config --from-file=./config.properties
           rm -f config.properties
 
