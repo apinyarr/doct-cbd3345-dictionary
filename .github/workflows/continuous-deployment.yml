@@ -48,3 +48,10 @@ jobs:
         run: |
           KUBECONFIG=~/.kube/docker_desktop_k8s_config helm upgrade --install simpledic-uat ./k8s/helm/mongodb/charts/
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get all
+
+      - name: Deploy the Simpledic deployment and service in K8s
+        run: |    # resource Ingress is required for production only, so it is ignored here.
+          echo "dictionary-ingress.yaml" > .helmignore
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config helm upgrade --install simpledic-uat ./k8s/helm/dictionary/charts/
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get all
+          echo "" > .helmignore
