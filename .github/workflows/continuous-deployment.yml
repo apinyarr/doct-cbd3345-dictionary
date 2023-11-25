@@ -43,3 +43,8 @@ jobs:
         run: |
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get secret secret-mongo-auth && echo "secret secret-mongo-auth is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete secret secret-mongo-auth || echo "creating a secret"
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl create secret generic secret-mongo-auth --from-literal=username=${{ secrets.MONGODB_USER }} --from-literal=password='${{ secrets.MONGODB_PWD }}'
+
+      - name: Deploy the MongoDB deployment and service in K8s
+        run: |
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config helm upgrade --install simpledic-${{ github.ref_name }} k8s/helm/mongodb/charts/
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config get all
