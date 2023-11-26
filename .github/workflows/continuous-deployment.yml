@@ -96,4 +96,4 @@ jobs:
         run: |
           sleep 30s
           echo "Click the URL below to test"
-          KUBECONFIG=~/.kube/eks_k8s_config kubectl describe ingress dictionary-ingress-resource | grep Address | awk '{url=$2":8088/search?word=click"; print url}'
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl describe ingress dictionary-ingress-resource | grep Address | awk '{url="http://"$2":8088/search?word=click"; print url}'
