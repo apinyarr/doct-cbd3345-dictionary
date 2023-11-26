@@ -81,3 +81,8 @@ jobs:
         run: |
           KUBECONFIG=~/.kube/eks_k8s_config kubectl get secret secret-mongo-auth && echo "secret secret-mongo-auth is already existed" && KUBECONFIG=~/.kube/eks_k8s_config kubectl delete secret secret-mongo-auth || echo "creating a secret"
           KUBECONFIG=~/.kube/eks_k8s_config kubectl create secret generic secret-mongo-auth --from-literal=username=${{ secrets.MONGODB_USER }} --from-literal=password='${{ secrets.MONGODB_PWD }}'
+
+      - name: Deploy the MongoDB deployment and service in EKS
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config helm upgrade -f ./k8s/helm/mongodb/charts/values-prd.yaml --install mongodb-prd ./k8s/helm/mongodb/charts/
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get all
