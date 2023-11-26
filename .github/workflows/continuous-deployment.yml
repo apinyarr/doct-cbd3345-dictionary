@@ -91,3 +91,9 @@ jobs:
         run: |  
           KUBECONFIG=~/.kube/eks_k8s_config helm upgrade -f ./k8s/helm/mongodb/charts/values-prd.yaml --install simpledic-prd ./k8s/helm/dictionary/charts/
           KUBECONFIG=~/.kube/eks_k8s_config kubectl get all
+
+      - name: Wait for 30s Ingress Service to be ready
+        run: |
+          sleep 30s
+          echo "Click the URL below to test"
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl describe ingress dictionary-ingress-resource | grep Address | awk '{url=$2":8088/search?word=click"; print url}'
