@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: dictionary
-        image: apinyarr/dictionary:v1.0.34
+        image: apinyarr/simpledict:v1.0.34
         env:
         - name: MONGODB_HOST
           valueFrom:

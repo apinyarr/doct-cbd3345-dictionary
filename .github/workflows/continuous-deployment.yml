@@ -1,0 +1,99 @@
+---
+name: Continuous Deployment (CD)
+on:
+  push:
+    tags:
+      - 'uat-release-*'
+      - 'prd-release-*'
+
+jobs:  
+  uat-deployment:   # This job is triggered by 'uat-release-*' tags.
+    name: Deploy Simple Dictionary App in UAT K8s Cluster
+    if: startsWith(github.ref, 'refs/tags/uat-release-')
+    runs-on: k8s-deployer
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Verify K8s Cluster Information
+        run: |
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl config get-clusters
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl cluster-info
+
+      - name: Ensure UAT namespace has been created
+        env:
+          UAT_NAMESPACE: dictionary-namespace
+        run: |
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get ns | grep ${{ env.UAT_NAMESPACE }} && echo ${{ env.UAT_NAMESPACE }} is existed || KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl apply -f k8s/manifests/namespace.yaml
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl config set-context --current --namespace=${{ env.UAT_NAMESPACE }}
+
+      - name: Deploy the required ConfigMap to the Namespace (MONGODB_HOST and MONGODB_PORT)
+        run: |
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get configmap dic-config && echo "configmap dic-config is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete configmap dic-config || echo "creating a configmap"
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl apply -f ./k8s/manifests/configmaps.yaml
+          
+
+      - name: Deploy the required Secret to the Namespace (MONGODB_USER and MONGODB_PWD)
+        run: |
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get secret secret-mongo-auth && echo "secret secret-mongo-auth is already existed" && KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl delete secret secret-mongo-auth || echo "creating a secret"
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl create secret generic secret-mongo-auth --from-literal=username=${{ secrets.MONGODB_USER }} --from-literal=password='${{ secrets.MONGODB_PWD }}'
+
+      - name: Deploy the MongoDB deployment and service in K8s
+        run: |
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config helm upgrade --install mongodb-uat ./k8s/helm/mongodb/charts/
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get all
+
+      - name: Deploy the Simpledic deployment and service in K8s
+        run: |    # resource Ingress is required for production only, so it is ignored here.
+          echo "dictionary-ingress.yaml" > .helmignore
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config helm upgrade --install simpledic-uat ./k8s/helm/dictionary/charts/
+          KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get all
+          echo "" > .helmignore
+
+  prd-deployment:   # This job is triggered by 'prd-release-*' tags.
+    name: Deploy Simple Dictionary App in PRD EKS Cluster
+    if: startsWith(github.ref, 'refs/tags/prd-release-')
+    runs-on: k8s-deployer
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Verify K8s Cluster Information
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl config get-clusters
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl cluster-info
+
+      - name: Ensure PRD namespace has been created
+        env:
+          PRD_NAMESPACE: dictionary-prd-namespace
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get ns | grep ${{ env.PRD_NAMESPACE }} && echo ${{ env.PRD_NAMESPACE }} is existed || KUBECONFIG=~/.kube/eks_k8s_config kubectl apply -f k8s/manifests/namespace.yaml
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl config set-context --current --namespace=${{ env.PRD_NAMESPACE }}
+
+      - name: Deploy the required ConfigMap to the Namespace (MONGODB_HOST and MONGODB_PORT)
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get configmap dic-config && echo "configmap dic-config is already existed" && KUBECONFIG=~/.kube/eks_k8s_config delete configmap dic-config || echo "creating a configmap"
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl apply -f ./k8s/manifests/configmaps-prd.yaml
+
+      - name: Deploy the required Secret to the Namespace (MONGODB_USER and MONGODB_PWD)
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get secret secret-mongo-auth && echo "secret secret-mongo-auth is already existed" && KUBECONFIG=~/.kube/eks_k8s_config kubectl delete secret secret-mongo-auth || echo "creating a secret"
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl create secret generic secret-mongo-auth --from-literal=username=${{ secrets.MONGODB_USER }} --from-literal=password='${{ secrets.MONGODB_PWD }}'
+
+      - name: Deploy the MongoDB deployment and service in EKS
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config helm upgrade -f ./k8s/helm/mongodb/charts/values-prd.yaml --install mongodb-prd ./k8s/helm/mongodb/charts/
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get all
+
+      - name: Deploy the Simpledic deployment and service in EKS
+        run: |  
+          KUBECONFIG=~/.kube/eks_k8s_config helm upgrade -f ./k8s/helm/mongodb/charts/values-prd.yaml --install simpledic-prd ./k8s/helm/dictionary/charts/
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get all
+
+      - name: Wait for 30s Ingress Service to be ready
+        run: |
+          sleep 30s
+          echo "Click the URL below to test"
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl describe ingress dictionary-ingress-resource | grep Address | awk '{url="http://"$2":8088/search?word=click"; print url}'
