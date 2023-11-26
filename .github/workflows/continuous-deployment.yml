@@ -53,3 +53,17 @@ jobs:
           KUBECONFIG=~/.kube/docker_desktop_k8s_config helm upgrade --install simpledic-uat ./k8s/helm/dictionary/charts/
           KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl get all
           echo "" > .helmignore
+
+  prd-deployment:   # This job is triggered by 'prd-release-*' tags.
+    name: Deploy Simple Dictionary App in PRD EKS Cluster
+    if: startsWith(github.ref, 'refs/tags/prd-release-')
+    runs-on: k8s-deployer
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Verify K8s Cluster Information
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl config get-clusters
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl cluster-info
