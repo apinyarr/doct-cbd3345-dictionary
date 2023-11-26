@@ -86,3 +86,8 @@ jobs:
         run: |
           KUBECONFIG=~/.kube/eks_k8s_config helm upgrade -f ./k8s/helm/mongodb/charts/values-prd.yaml --install mongodb-prd ./k8s/helm/mongodb/charts/
           KUBECONFIG=~/.kube/eks_k8s_config kubectl get all
+
+      - name: Deploy the Simpledic deployment and service in EKS
+        run: |  
+          KUBECONFIG=~/.kube/eks_k8s_config helm upgrade --install simpledic-prd ./k8s/helm/dictionary/charts/
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get all
