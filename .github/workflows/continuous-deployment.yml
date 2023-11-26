@@ -72,5 +72,13 @@ jobs:
         env:
           PRD_NAMESPACE: dictionary-prd-namespace
         run: |
-          KUBECONFIG=~/.kube/eks_k8s_config kubectl get ns | grep ${{ env.PRD_NAMESPACE }} && echo ${{ env.PRD_NAMESPACE }} is existed || KUBECONFIG=~/.kube/docker_desktop_k8s_config kubectl apply -f k8s/manifests/namespace.yaml
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get ns | grep ${{ env.PRD_NAMESPACE }} && echo ${{ env.PRD_NAMESPACE }} is existed || KUBECONFIG=~/.kube/eks_k8s_config kubectl apply -f k8s/manifests/namespace.yaml
           KUBECONFIG=~/.kube/eks_k8s_config kubectl config set-context --current --namespace=${{ env.PRD_NAMESPACE }}
+
+      - name: Deploy the required ConfigMap to the Namespace (MONGODB_HOST and MONGODB_PORT)
+        env:
+          MONGODB_HOST: dic-mongodb-service
+          MONGODB_PORT: 27017
+        run: |
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl get configmap dic-config && echo "configmap dic-config is already existed" && KUBECONFIG=~/.kube/eks_k8s_config delete configmap dic-config || echo "creating a configmap"
+          KUBECONFIG=~/.kube/eks_k8s_config kubectl apply -f ./k8s/manifests/configmaps.yaml
