@@ -2,7 +2,7 @@ version: '3'
 
 services:
   dic_db:
-    image: mongo:6.0.4-jammy
+    image: mongo:6.0.4-latest
     volumes:
       - db_data:/data/db
     restart: always
@@ -11,7 +11,7 @@ services:
   dic_backend:
     image: apinyarr/dic-backend:v1.0
     ports:
-      - 8088:8088
+      - 8080:8080
     restart: always
     depends_on:
       - dic_db
