@@ -6,7 +6,7 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: Environment=dev,Team=test
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 8088}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 8080}]'
   labels:
     app: dictionary-ingress
 spec:
@@ -20,4 +20,4 @@ spec:
               service:
                 name: dictionary-service
                 port:
-                  number: 8088
+                  number: 8080
