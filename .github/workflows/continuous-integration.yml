@@ -56,8 +56,8 @@ jobs:
           echo "#!/bin/bash" > script.sh
           echo "docker exec mongodb mongosh -u ${{ secrets.MONGODB_USER }} -p ${{ secrets.MONGODB_PWD }} --eval 'use dictionary' --eval 'db.wordscollection.findOne()'" >> script.sh
           cat script.sh
-          chmod +x script.sh | tee integration-test-results.txt
-          ./script.sh
+          chmod +x script.sh
+          ./script.sh | tee integration-test-results.txt
 
       - name: Upload Integration Test Artifact    #Rohit Rana Dec 06 2023
         uses: actions/upload-artifact@v3
