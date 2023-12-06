@@ -59,7 +59,7 @@ jobs:
           chmod +x script.sh | tee integration-test-results.txt
           ./script.sh
 
-      - name: Upload Integration Test Artifact
+      - name: Upload Integration Test Artifact    #Rohit Rana Dec 06 2023
         uses: actions/upload-artifact@v3
         with:
           name: integration-test-result-${{ github.run_number }}
