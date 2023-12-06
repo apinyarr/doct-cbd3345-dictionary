@@ -57,7 +57,13 @@ jobs:
           echo "docker exec mongodb mongosh -u ${{ secrets.MONGODB_USER }} -p ${{ secrets.MONGODB_PWD }} --eval 'use dictionary' --eval 'db.wordscollection.findOne()'" >> script.sh
           cat script.sh
           chmod +x script.sh
-          ./script.sh
+          ./script.sh | tee integration-test-results.txt
+
+      - name: Upload Integration Test Artifact    #Rohit Rana Dec 06 2023
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-result-${{ github.run_number }}
+          path: ./integration-test-results.txt
 
       - name: Unit Test
         run: MONGODB_USER='${{ secrets.MONGODB_USER }}' MONGODB_PWD='${{ secrets.MONGODB_PWD }}' pytest ./tests/test_app_json.py --doctest-modules --junitxml=junit/unit-test-results.xml
