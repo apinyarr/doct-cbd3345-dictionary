@@ -4,27 +4,35 @@ Containerization and Container Delivery - Backend Application
 ## Structure
 
 ```
-doct-cbd3324-backend/
-├── app/
-│   ├── main.py
-│   ├── ...
-├── Dockerfile
-├── docker-compose.yml
-├── k8s/
-│   ├── helm/
-│   │   ├── backend/
-│   │   │   ├── charts/
-│   │   │   │   ├── backend/
-│   │   │   │   ├── ...
-│   │   ├── values.yaml
-│   ├── manifests/
-│   │   ├── deployment.yaml
-│   │   ├── service.yaml
-│   │   ├── ...
-├── requirements.txt
+doct-cbd3324-backend/           
+├── app/                        # Python Flask application path
+│   ├── main.py                 # Python Web Application code
+│   └── ...
+├── k8s/                        # K8s folder
+│   ├── helm/                   # Helm structure path
+│   │   ├── dictionary/         # Dictionary chart
+│   │   ├── mongodb/            # MongoDB chart
+│   │   ├── rbac/               # RBAC chart
+│   │   ├── values.yaml         # Charts share value file
+|   |   └── ...
+│   └── manifests/
+|       ├── dictionary/         # Dictionary manifest files
+|       ├── mongodb/            # MongoDB manifest files
+|       ├── rback/              # RBAC manifest files
+|       ├── configmaps-prd.yml  # ConfigMap config for PRD
+|       ├── configmaps.yml      # ConfigMap config for UAT
+|       ├── namespace-prd.yml   # Namespace config for PRD
+|       ├── namespace.yml       # Namespace config for UAT
+|       ├── secrets.yml         # Secret config file
+|       └── ...
 ├── tests/
-│   ├── __init__.py
-├── .gitignore
+│   ├── __init__.py             # Module structure file
+│   ├── test_app_json.py        # Python unit test file
+├── .gitignore                  # Excluded Files List for Git
+├── docker-compose.yml          # Docker Compose file for multi-container
+├── Dockerfile                  # Dockerfile to build an image
+├── README.md                   # This readme file
+├── requirements.txt            # Python dependencies requirement
 └── ...
 ```
 
